@@ -1,0 +1,85 @@
+version: "3.3"
+services:
+
+  node_1:
+    hostname: node_1
+    image: mongo:3.6
+    restart: unless-stopped
+    # environment:
+    #   MONGO_INITDB_ROOT_PASSWORD: Pa55w0rd!
+    #   MONGO_INITDB_ROOT_USERNAME: root
+    working_dir: /etc/mongo
+    volumes:
+      - './:/src'
+      - 'node_1_data:/data/db'
+    ports:
+      - "27017:27017"
+    command: 
+      - "--replSet=rs0"
+
+
+  node_2:
+    hostname: node_2
+    image: mongo:3.6
+    restart: unless-stopped
+    # environment:
+    #   MONGO_INITDB_ROOT_PASSWORD: Pa55w0rd!
+    #   MONGO_INITDB_ROOT_USERNAME: root
+    working_dir: /etc/mongo
+    volumes:
+      - './:/src'
+      - 'node_2_data:/data/db'
+    ports:
+      - "27018:27017"
+    command: 
+      - "--replSet=rs0"
+
+  node_3:
+    hostname: node_3
+    image: mongo:3.6
+    restart: unless-stopped
+    # environment:
+    #   MONGO_INITDB_ROOT_PASSWORD: Pa55w0rd!
+    #   MONGO_INITDB_ROOT_USERNAME: root
+    working_dir: /etc/mongo
+    volumes:
+      - './:/src'
+      - 'node_3_data:/data/db'
+    ports:
+      - "27019:27017"
+    command: 
+      - "--replSet=rs0"
+  
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+
+  node_exporter:
+    image: prom/node-exporter
+
+  exporter:
+    image: eses/mongodb_exporter
+    ports:
+      - "9104"
+    environment:
+      MONGODB_URI: 'mongodb://node_1:27017'
+
+  grafana:
+    image: grafana/grafana
+    volumes:
+      - './grafana/grafana.ini:/etc/grafana/grafana.ini'
+      - './grafana/provisioning:/etc/grafana/provisioning'
+    ports:
+      - "3000:3000"
+
+volumes:
+  node_1_data:
+  node_2_data:
+  node_3_data:
+
+
+
+
